@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SuperFly | Onboarding</title>
+    <title>SuperFly | Welcome</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
@@ -15,40 +15,22 @@
             font-family: 'Inter', sans-serif; overflow: hidden; 
         }
 
-        /* CONTAINER UTAMA (VERTIKAL) */
-        .slider-wrapper {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
-
+        /* SLIDER TETEP HORIZONTAL */
         .slider { 
-            display: flex; 
-            flex-direction: column; /* Biar numpuk ke bawah */
-            width: 100%; 
-            height: 300%; /* 3 Slide */
-            transition: transform 1.2s cubic-bezier(0.85, 0, 0.15, 1); 
+            display: flex; width: 300%; height: 100%; 
+            transition: transform 1.1s cubic-bezier(0.65, 0, 0.35, 1); 
         }
 
         .slide { 
-            width: 100%; 
-            height: 33.3333dvh; /* Setiap slide setinggi layar */
-            display: flex; 
-            flex-direction: column; 
-            justify-content: flex-end; 
-            padding: 0 10% 180px; 
-            position: relative;
-            background-size: cover;
-            background-position: center;
+            width: 33.3333%; height: 100%; 
+            display: flex; flex-direction: column; 
+            justify-content: flex-end; padding: 0 10% 160px; 
+            position: relative; background-size: cover; background-position: center;
         }
 
-        /* Gradient Overlay */
         .slide::after {
-            content: '';
-            position: absolute;
-            bottom: 0; left: 0; width: 100%; height: 70%;
-            background: linear-gradient(to top, rgba(0,0,0,1) 30%, transparent 100%);
-            z-index: 1;
+            content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 65%;
+            background: linear-gradient(to top, rgba(0,0,0,1) 20%, transparent 100%); z-index: 1;
         }
 
         .slide:nth-child(1) { background-image: url('onboarding1.png'); }
@@ -57,80 +39,95 @@
 
         .content { z-index: 5; position: relative; }
 
-        /* ANIMASI TEKS (FADE IN + SLIGHT UP) */
-        .slide h1, .slide p { 
-            opacity: 0; 
-            transform: translateY(30px);
-            transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        /* --- ANIMASI TEKS SMOOTH KE ATAS (INI YANG LO MAKSUD) --- */
+        @keyframes slideUpLuxury {
+            0% { 
+                opacity: 0; 
+                transform: translateY(60px); 
+                filter: blur(10px);
+            }
+            100% { 
+                opacity: 1; 
+                transform: translateY(0); 
+                filter: blur(0);
+            }
         }
 
-        .slide.active h1 { opacity: 1; transform: translateY(0); transition-delay: 0.5s; }
-        .slide.active p { opacity: 0.6; transform: translateY(0); transition-delay: 0.7s; }
+        /* State awal teks: Hilang */
+        .slide h1, .slide p { opacity: 0; }
+
+        /* Trigger saat slide aktif */
+        .slide.active h1 { 
+            animation: slideUpLuxury 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+            animation-delay: 0.5s; /* Nunggu slide geser selesai dikit */
+        }
+
+        .slide.active p { 
+            animation: slideUpLuxury 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+            animation-delay: 0.7s; /* Muncul setelah judul */
+        }
 
         h1 { 
-            font-size: clamp(2.2rem, 9vw, 3.8rem); 
-            font-weight: 900; line-height: 0.95; 
-            margin-bottom: 15px; text-transform: uppercase;
+            font-size: clamp(2.2rem, 9vw, 3.2rem); font-weight: 900; 
+            line-height: 1; margin-bottom: 12px; text-transform: uppercase; letter-spacing: -1px;
         }
 
-        p { font-size: 1rem; color: #fff; max-width: 280px; line-height: 1.6; margin-bottom: 30px; }
+        p { 
+            font-size: 0.95rem; color: rgba(255,255,255,0.6); 
+            max-width: 280px; line-height: 1.5; margin-bottom: 25px; 
+        }
 
-        /* FOOTER & BUTTON TETEP DI POSISI */
+        /* DOTS & BUTTON */
         .footer { 
-            position: fixed; bottom: 50px; left: 0; width: 100%; 
-            display: flex; flex-direction: column; align-items: center; 
-            gap: 35px; z-index: 10; 
+            position: fixed; bottom: 45px; left: 0; width: 100%; 
+            display: flex; flex-direction: column; align-items: center; gap: 25px; z-index: 10; 
         }
 
-        .dots { display: flex; flex-direction: column; gap: 10px; position: fixed; right: 25px; top: 50%; transform: translateY(-50%); }
-        .dot { width: 6px; height: 6px; background: rgba(255,255,255,0.3); border-radius: 50%; transition: 0.5s; }
-        .dot.active { height: 30px; background: #fff; border-radius: 10px; }
+        .dots { display: flex; gap: 10px; }
+        .dot { width: 7px; height: 7px; background: rgba(255,255,255,0.2); border-radius: 50%; transition: 0.4s; }
+        .dot.active { width: 28px; background: #fff; border-radius: 10px; }
 
         .main-btn { 
-            width: 85%; max-width: 400px; background: #fff; color: #000; 
-            border: none; padding: 22px; border-radius: 100px; 
-            font-weight: 800; font-size: 1rem;
-            display: flex; justify-content: center; align-items: center; gap: 15px; 
-            cursor: pointer; box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            width: 85%; max-width: 380px; background: #fff; color: #000; 
+            border: none; padding: 18px; border-radius: 100px; 
+            font-weight: 800; font-size: 0.95rem; display: flex; 
+            justify-content: center; align-items: center; gap: 12px; 
         }
     </style>
 </head>
 <body>
 
-    <div class="slider-wrapper">
-        <div class="slider" id="slider">
-            <div class="slide active">
-                <div class="content">
-                    <h1>Elevate<br>Style.</h1>
-                    <p>Koleksi fashion premium untuk standar hidup yang lebih tinggi.</p>
-                </div>
+    <div class="slider" id="slider">
+        <div class="slide active">
+            <div class="content">
+                <h1>Elevate<br>Style.</h1>
+                <p>Koleksi fashion premium untuk standar hidup yang lebih tinggi.</p>
             </div>
-            <div class="slide">
-                <div class="content">
-                    <h1>Safe<br>Market.</h1>
-                    <p>Jaminan keamanan dan keaslian produk di setiap transaksi Anda.</p>
-                </div>
+        </div>
+        <div class="slide">
+            <div class="content">
+                <h1>Safe<br>Market.</h1>
+                <p>Jaminan keamanan dan keaslian produk di setiap transaksi Anda.</p>
             </div>
-            <div class="slide">
-                <div class="content">
-                    <h1>Ready<br>To Fly?</h1>
-                    <p>Masuk ke pengalaman belanja paling eksklusif bersama SuperFly.</p>
-                </div>
+        </div>
+        <div class="slide">
+            <div class="content">
+                <h1>Ready<br>To Fly?</h1>
+                <p>Masuk ke pengalaman belanja paling eksklusif bersama SuperFly.</p>
             </div>
         </div>
     </div>
 
     <div class="footer">
+        <div class="dots">
+            <div class="dot active"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
         <button class="main-btn" id="actionBtn">
             <span id="btnText">NEXT</span>
-            <i class="fa-solid fa-arrow-up-long"></i>
+            <i class="fa-solid fa-arrow-right-long"></i>
         </button>
-    </div>
-
-    <div class="dots">
-        <div class="dot active"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
     </div>
 
     <script>
@@ -143,17 +140,18 @@
 
         actionBtn.onclick = () => {
             if (currentSlide < 2) { 
+                // Reset animasi slide sebelumnya
                 slides[currentSlide].classList.remove('active');
-                currentSlide++; 
                 
-                // GESER KE ATAS (bukan ke samping)
-                slider.style.transform = `translateY(-${currentSlide * 33.3333}%)`;
+                currentSlide++; 
+                slider.style.transform = `translateX(-${currentSlide * 33.3333}%)`;
                 
                 dots.forEach((dot, i) => dot.classList.toggle('active', i === currentSlide));
                 
+                // Trigger animasi teks di slide baru dengan sedikit delay
                 setTimeout(() => {
                     slides[currentSlide].classList.add('active');
-                }, 400);
+                }, 300);
 
                 if(currentSlide === 2) btnText.innerText = "GET STARTED";
             } else { 
