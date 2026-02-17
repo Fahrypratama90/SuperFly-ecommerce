@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuperFly | Elite Product</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        @font-face { font-family: 'Nourd'; src: url('nourd-bold.woff2') format('woff2'); font-weight: bold; }
+        
+        :root { 
+            --white: #ffffff; 
+            --black: #000000; 
+            --gray: #86868b; 
+            --nourd: 'Nourd', 'Inter', sans-serif; 
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        
+        body, html { 
+            height: 100%; 
+            font-family: 'Inter', sans-serif; 
+            background: var(--black); 
+            overflow: hidden; 
+        }
+
+        /* --- BACKGROUND FULL SCREEN --- */
+        .full-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+        }
+        .full-bg img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+
+        /* --- VIGNETTE & OVERLAY --- */
+        .vignette-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, 
+                rgba(0,0,0,0.2) 0%, 
+                rgba(0,0,0,0) 40%, 
+                rgba(0,0,0,0.8) 80%, 
+                rgba(0,0,0,1) 100%);
+            z-index: 2;
+        }
+
+        /* --- HEADER --- */
+        header { 
+            position: fixed; top: 0; width: 100%; padding: 25px;
+            display: flex; justify-content: space-between; align-items: center; 
+            z-index: 100;
+        }
+        .back-btn, .wish-btn { 
+            width: 45px; height: 45px; background: rgba(255,255,255,0.2); 
+            backdrop-filter: blur(10px); border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center;
+            color: white; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* --- WISHLIST ANIMATION --- */
+        .wish-btn i { font-size: 1.2rem; transition: 0.3s; }
+        .wish-btn.active { background: white; border-color: white; }
+        .wish-btn.active i { color: #ff3b30; transform: scale(1.1); animation: heartBeat 0.4s; }
+
+        @keyframes heartBeat {
+            0% { transform: scale(1.1); }
+            50% { transform: scale(1.4); }
+            100% { transform: scale(1.1); }
+        }
+
+        /* --- BOTTOM CONTENT --- */
+        .content-container {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            padding: 30px 24px 50px;
+            z-index: 10; display: flex; flex-direction: column; gap: 20px;
+        }
+
+        /* --- ACTION BUTTONS --- */
+        .actions { display: flex; gap: 12px; }
+        .btn { 
+            flex: 1; padding: 20px; border-radius: 18px; font-size: 0.9rem; 
+            font-weight: 800; cursor: pointer; border: none; 
+            text-transform: uppercase; letter-spacing: 1px; transition: 0.3s;
+        }
+        .btn-cart { background: rgba(255,255,255,0.15); color: white; backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); }
+        .btn-buy { background: white; color: black; }
+        .btn:active { transform: scale(0.95); }
+
+        /* --- INFO AREA --- */
+        .info { color: white; animation: fadeInUp 0.8s ease; }
+        .brand-label { font-family: var(--nourd); font-size: 0.65rem; color: rgba(255,255,255,0.5); letter-spacing: 3px; margin-bottom: 5px; }
+        .product-name { font-family: var(--nourd); font-size: 2.2rem; text-transform: uppercase; margin-bottom: 5px; line-height: 1; }
+        .product-price { font-size: 1.2rem; font-weight: 400; color: rgba(255,255,255,0.8); margin-bottom: 15px; }
+        .product-desc { font-size: 0.85rem; color: rgba(255,255,255,0.6); line-height: 1.6; max-width: 90%; }
+
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="back-btn" onclick="history.back()"><i class="fa-solid fa-chevron-left"></i></div>
+        <div style="color: white; font-family: 'Nourd'; font-size: 0.7rem; letter-spacing: 2px;">SUPERFLY ELITE</div>
+        <div class="wish-btn" id="btnWishlist"><i class="fa-regular fa-heart"></i></div>
+    </header>
+
+    <div class="full-bg">
+        <img id="displayImg" src="" alt="Product Image">
+    </div>
+
+    <div class="vignette-overlay"></div>
+
+    <div class="content-container">
+        <div class="actions">
+            <button class="btn btn-cart" id="btnAddToCart">Cart</button>
+            <button class="btn btn-buy" id="btnBuyNow">Buy Now</button>
+        </div>
+
+        <div class="info">
+            <div class="brand-label">ELITE COLLECTION</div>
+            <h1 class="product-name" id="displayName">Loading...</h1>
+            <div class="product-price" id="displayPrice">...</div>
+            <p class="product-desc" id="displayDesc">...</p>
+        </div>
+    </div>
+
+    <script>
+        const products = {
+            "aero-phone-z": { name: "Aero Phone Z", price: "Rp 15.000.000", img: "./hp1.png", desc: "Symmetry in every pixel. Aero Phone Z redefines the standard of future mobile technology." },
+            "flybook-m1": { name: "FlyBook M1", price: "Rp 22.500.000", img: "./laptop2.png", desc: "Power has a new weight. At only 0.9kg, it's the most powerful creative tool ever made." },
+            "nova-runner": { name: "Nova Runner", price: "Rp 2.400.000", img: "./sepatu3.png", desc: "Engineered for flight. Experience the zero-gravity sensation with our latest Nova foam." },
+            "produk1": { name: "Aero Glass 17", price: "Rp 12.000.000", img: "./produk1.png", desc: "Crystal clear performance. The first smartphone with a truly borderless glass display." },
+            "produk2": { name: "FlyBook Ultra", price: "Rp 25.000.000", img: "./produk2.png", desc: "Beyond computing. A masterpiece of engineering for the world's most demanding tasks." },
+            "produk3": { name: "Sonic Shell X", price: "Rp 3.500.000", img: "./produk3.png", desc: "Pure silence. Pure sound. The ultimate hybrid noise-canceling headphones." },
+            "produk4": { name: "Zenith Wrist", price: "Rp 5.000.000", img: "./produk4.png", desc: "Timeless elegance. A mechanical marvel designed to be passed down through generations." },
+            "produk5": { name: "Nova Sneakers", price: "Rp 2.000.000", img: "./produk5.png", desc: "Street aesthetics meets athletic performance. Our most versatile sneaker yet." },
+            "produk6": { name: "Titan Backpack", price: "Rp 1.500.000", img: "./produk6.png", desc: "Indestructible style. Weatherproof materials to keep your gear safe in any environment." },
+            "produk7": { name: "Ocular Pro", price: "Rp 45.000.000", img: "./produk7.png", desc: "The portal to new worlds. Experience 8K spatial computing like never before." },
+            "produk8": { name: "Core Clicker", price: "Rp 2.200.000", img: "./produk8.png", desc: "Tactile perfection. Every keypress is a symphony of mechanical precision." },
+            "produk9": { name: "Lumina Beam", price: "Rp 1.100.000", img: "./produk9.png", desc: "Smart ambient lighting. Control the atmosphere of your space with a single touch." },
+            "produk10": { name: "Velocity Runner", price: "Rp 2.800.000", img: "./produk10.png", desc: "Break your limits. Lightweight carbon-plated shoes for elite marathon runners." },
+            "produk11": { name: "Apex Wallet", price: "Rp 850.000", img: "./produk11.png", desc: "Forged in titanium. The last wallet you will ever need to buy." },
+            "produk12": { name: "Crono Spectre", price: "Rp 7.500.000", img: "./produk12.png", desc: "Shadow in motion. A stealth-edition watch that commands presence through silence." }
+        };
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('id');
+        const p = products[productId];
+        const wishBtn = document.getElementById('btnWishlist');
+
+        if (productId && p) {
+            document.getElementById('displayName').innerText = p.name;
+            document.getElementById('displayPrice').innerText = p.price;
+            document.getElementById('displayDesc').innerText = p.desc;
+            document.getElementById('displayImg').src = p.img;
+            document.title = p.name + " | SuperFly";
+            
+            // CEK STATUS WISHLIST SETIAP KALI HALAMAN DIBUKA
+            checkInitialWishlist();
+        } else {
+            window.location.href = 'main.html';
+        }
+
+        function checkInitialWishlist() {
+            let wishlist = JSON.parse(localStorage.getItem('sf_wishlist')) || [];
+            // Cari apakah produk ini sudah ada di wishlist
+            const isFav = wishlist.some(item => item.id === productId);
+            
+            if (isFav) {
+                wishBtn.classList.add('active');
+                wishBtn.innerHTML = '<i class="fa-solid fa-heart"></i>'; // Merah penuh
+            } else {
+                wishBtn.classList.remove('active');
+                wishBtn.innerHTML = '<i class="fa-regular fa-heart"></i>'; // Garis saja
+            }
+        }
+
+        wishBtn.onclick = () => {
+            let wishlist = JSON.parse(localStorage.getItem('sf_wishlist')) || [];
+            const index = wishlist.findIndex(item => item.id === productId);
+
+            if (index === -1) {
+                // TAMBAH: Jika belum ada di wishlist
+                wishlist.push({ 
+                    id: productId, 
+                    name: p.name, 
+                    price: p.price, 
+                    img: p.img 
+                });
+                wishBtn.classList.add('active');
+                wishBtn.innerHTML = '<i class="fa-solid fa-heart"></i>';
+            } else {
+                // HAPUS: Jika sudah ada di wishlist (toggle off)
+                wishlist.splice(index, 1);
+                wishBtn.classList.remove('active');
+                wishBtn.innerHTML = '<i class="fa-regular fa-heart"></i>';
+            }
+
+            // Simpan perubahan ke localStorage
+            localStorage.setItem('sf_wishlist', JSON.stringify(wishlist));
+        };
+
+        // FUNGSI TOMBOL CART
+        document.getElementById('btnAddToCart').onclick = () => {
+            let cart = JSON.parse(localStorage.getItem('sf_cart')) || [];
+            cart.push({ id: productId, name: p.name, price: p.price, img: p.img });
+            localStorage.setItem('sf_cart', JSON.stringify(cart));
+            window.location.href = 'cart.html';
+        };
+
+        // FUNGSI TOMBOL BUY NOW
+        document.getElementById('btnBuyNow').onclick = () => {
+            localStorage.setItem('sf_checkout', JSON.stringify({ name: p.name, price: p.price, img: p.img }));
+            window.location.href = 'checkout.html';
+        };
+    </script>
+</body>
+</html>

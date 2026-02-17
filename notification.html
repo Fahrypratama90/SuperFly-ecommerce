@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuperFly | Notifications</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        @font-face { font-family: 'Nourd'; src: url('nourd-bold.woff2') format('woff2'); font-weight: bold; }
+        :root { --bg: #ffffff; --text: #1d1d1f; --gray: #86868b; --accent: #000000; --nourd: 'Nourd', sans-serif; --danger: #ff3b30; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        body { font-family: 'Inter', sans-serif; background: #f5f5f7; color: var(--text); }
+
+        header { background: #fff; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(0,0,0,0.05); }
+        header h1 { font-family: var(--nourd); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+
+        .notif-actions { display: flex; justify-content: space-between; padding: 15px 24px; background: #fff; border-bottom: 1px solid #eee; }
+        .action-link { font-size: 0.75rem; font-weight: 700; color: var(--gray); text-transform: uppercase; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        .action-link:hover { color: var(--accent); }
+        .action-link.delete { color: var(--danger); }
+
+        .notif-container { padding: 0; }
+        .notif-item { background: #fff; padding: 20px 24px; border-bottom: 1px solid #f5f5f7; display: flex; gap: 15px; align-items: flex-start; position: relative; transition: 0.3s; }
+        .notif-item.unread { background: #fafafa; }
+        .notif-item.unread::before { content: ''; position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 6px; height: 6px; background: var(--danger); border-radius: 50%; }
+        
+        .notif-icon { width: 45px; height: 45px; background: #f5f5f7; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .notif-content h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 4px; }
+        .notif-content p { font-size: 0.85rem; color: var(--gray); line-height: 1.4; }
+        .notif-time { font-size: 0.7rem; color: #bbb; margin-top: 8px; display: block; }
+        
+        .empty-notif { text-align: center; padding: 100px 24px; color: #ccc; }
+        .empty-notif i { font-size: 3rem; margin-bottom: 15px; }
+
+        /* --- CUSTOM MODAL --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px; }
+        .modal-box { background: white; width: 100%; max-width: 320px; border-radius: 24px; padding: 30px 24px; text-align: center; transform: scale(0.9); transition: 0.3s; }
+        .modal-overlay.active { display: flex; }
+        .modal-overlay.active .modal-box { transform: scale(1); }
+        .modal-box h2 { font-family: var(--nourd); font-size: 1rem; margin-bottom: 10px; }
+        .modal-box p { font-size: 0.85rem; color: var(--gray); margin-bottom: 25px; }
+        .modal-btns { display: flex; flex-direction: column; gap: 10px; }
+        .btn-m { padding: 16px; border-radius: 14px; border: none; font-weight: 700; font-size: 0.9rem; cursor: pointer; }
+        .btn-confirm { background: var(--accent); color: white; }
+        .btn-confirm.danger { background: var(--danger); }
+        .btn-cancel { background: #f5f5f7; color: var(--text); }
+    </style>
+</head>
+<body>
+    <header>
+        <i class="fa-solid fa-chevron-left" onclick="history.back()" style="cursor:pointer"></i>
+        <h1>Notifications</h1>
+        <div style="width: 20px;"></div>
+    </header>
+
+    <div class="notif-actions" id="actionArea">
+        <div class="action-link" onclick="openModal('read')"><i class="fa-solid fa-check-double"></i> Baca Semua</div>
+        <div class="action-link delete" onclick="openModal('delete')"><i class="fa-solid fa-trash-can"></i> Hapus</div>
+    </div>
+
+    <div class="notif-container" id="notifList"></div>
+
+    <div class="modal-overlay" id="customModal">
+        <div class="modal-box">
+            <h2 id="modalTitle">Konfirmasi</h2>
+            <p id="modalDesc">Apakah Anda yakin?</p>
+            <div class="modal-btns">
+                <button class="btn-m btn-confirm" id="confirmBtn">Ya, Lanjutkan</button>
+                <button class="btn-m btn-cancel" onclick="closeModal()">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentAction = "";
+
+        function loadNotifs() {
+            const notifs = JSON.parse(localStorage.getItem('sf_notifications')) || [];
+            const container = document.getElementById('notifList');
+            const actionArea = document.getElementById('actionArea');
+            const isUnread = localStorage.getItem('sf_notif_unread') === 'true';
+            
+            if (notifs.length === 0) {
+                container.innerHTML = `<div class="empty-notif"><i class="fa-solid fa-bell-slash"></i><p style="margin-top:15px;">Belum ada notifikasi</p></div>`;
+                actionArea.style.display = 'none';
+                return;
+            }
+
+            actionArea.style.display = 'flex';
+            container.innerHTML = notifs.slice().reverse().map(n => `
+                <div class="notif-item ${isUnread ? 'unread' : ''}">
+                    <div class="notif-icon"><i class="fa-solid fa-bag-shopping"></i></div>
+                    <div class="notif-content">
+                        <h3>Order Success!</h3>
+                        <p>Pesanan <strong>${n.productName}</strong> senilai ${n.price} berhasil diproses.</p>
+                        <span class="notif-time">${n.date}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // FUNGSI MODAL
+        function openModal(action) {
+            currentAction = action;
+            const modal = document.getElementById('customModal');
+            const title = document.getElementById('modalTitle');
+            const desc = document.getElementById('modalDesc');
+            const confirmBtn = document.getElementById('confirmBtn');
+
+            modal.classList.add('active');
+            if(action === 'read') {
+                title.innerText = "Tandai Dibaca";
+                desc.innerText = "Hapus tanda seru merah dari semua notifikasi?";
+                confirmBtn.innerText = "Ya, Tandai Dibaca";
+                confirmBtn.className = "btn-m btn-confirm";
+            } else {
+                title.innerText = "Hapus Riwayat";
+                desc.innerText = "Hapus semua notifikasi secara permanen?";
+                confirmBtn.innerText = "Ya, Hapus Semua";
+                confirmBtn.className = "btn-m btn-confirm danger";
+            }
+        }
+
+        function closeModal() { document.getElementById('customModal').classList.remove('active'); }
+
+        document.getElementById('confirmBtn').onclick = () => {
+            if(currentAction === 'read') {
+                localStorage.setItem('sf_notif_unread', 'false');
+            } else {
+                localStorage.removeItem('sf_notifications');
+                localStorage.setItem('sf_notif_unread', 'false');
+            }
+            closeModal();
+            loadNotifs();
+        };
+
+        window.onload = loadNotifs;
+    </script>
+</body>
+</html>

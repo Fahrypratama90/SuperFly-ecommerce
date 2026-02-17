@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar | SuperFly</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-light: #f5f5f7;
+            --text-main: #1d1d1f;
+            --text-gray: #6e6e73;
+            --accent: #000000;
+            --error: #ff3b30;
+            --success: #34c759;
+            --glass: rgba(255, 255, 255, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.8);
+        }
+
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: #e5e5e7;
+            min-height: 100vh; 
+            display: flex; 
+            justify-content: center;
+            align-items: center; 
+            padding: 24px; 
+            position: relative; 
+            overflow-x: hidden;
+        }
+
+        /* --- BACKGROUND --- */
+        .bg-elements {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0;
+            background: radial-gradient(circle at 0% 0%, #ffffff 0%, #e5e5e7 50%, #d2d2d7 100%);
+        }
+        .blob {
+            position: absolute; width: 500px; height: 500px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(210,210,215,0.5) 100%);
+            filter: blur(80px); border-radius: 50%; z-index: 0;
+            animation: move 20s infinite alternate;
+        }
+        .blob-1 { top: -100px; right: -100px; }
+        .blob-2 { bottom: -150px; left: -100px; animation-delay: -5s; }
+        .noise {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1; opacity: 0.04; pointer-events: none;
+            background: url('https://grainy-gradients.vercel.app/noise.svg');
+        }
+
+        @keyframes move { from { transform: translate(0, 0) rotate(0deg); } to { transform: translate(50px, 100px) rotate(30deg); } }
+
+        .reg-wrapper { 
+            position: relative; 
+            z-index: 10; 
+            width: 100%; 
+            max-width: 400px; 
+            text-align: center;
+            margin: auto;
+        }
+
+        .logo-text { font-size: 2.8rem; font-weight: 800; color: var(--text-main); letter-spacing: -3px; margin-bottom: 5px; }
+        .subtitle { font-size: 0.9rem; color: var(--text-gray); margin-bottom: 30px; font-weight: 500; letter-spacing: 0.5px; }
+
+        /* --- THE GLASS BOX --- */
+        .glass-box {
+            background: var(--glass);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 38px;
+            padding: 40px 30px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.1);
+            animation: boxEntrance 1s cubic-bezier(0.2, 1, 0.2, 1);
+        }
+
+        @keyframes boxEntrance { from { opacity: 0; transform: scale(0.9) translateY(30px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+
+        h2 { font-size: 1.5rem; font-weight: 800; color: var(--text-main); margin-bottom: 25px; letter-spacing: -0.5px; }
+
+        .form-container { display: flex; flex-direction: column; gap: 12px; }
+
+        .input-field {
+            width: 100%; padding: 18px 20px; background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(0, 0, 0, 0.05); border-radius: 20px; font-size: 0.95rem;
+            color: var(--text-main); transition: 0.3s;
+        }
+
+        .input-field:focus { outline: none; background: #fff; border-color: var(--accent); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+
+        .btn-reg {
+            width: 100%; padding: 18px; background: var(--accent);
+            color: #fff; border: none; border-radius: 20px;
+            font-size: 1rem; font-weight: 700; margin-top: 10px; cursor: pointer; transition: 0.4s;
+        }
+        .btn-reg:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0,0,0,0.2); }
+        .btn-reg:active { transform: scale(0.97); }
+
+        .footer-link { margin-top: 30px; font-size: 0.95rem; color: var(--text-gray); }
+        .footer-link a { color: var(--text-main); text-decoration: none; font-weight: 700; border-bottom: 1.5px solid var(--accent); }
+
+        #regMessage { font-size: 0.85rem; margin-top: 15px; display: none; font-weight: 600; }
+        .error-msg { color: var(--error); }
+        .success-msg { color: var(--success); }
+    </style>
+</head>
+<body>
+
+    <div class="bg-elements">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="noise"></div>
+    </div>
+
+    <div class="reg-wrapper">
+        <h1 class="logo-text">SuperFly<span>.</span></h1>
+        <p class="subtitle">Join the elite community.</p>
+
+        <div class="glass-box">
+            <h2>Daftar Akun</h2>
+            <form id="registerForm" class="form-container">
+                <input type="text" id="regUser" class="input-field" placeholder="Username" required>
+                <input type="email" id="regEmail" class="input-field" placeholder="Gmail" required>
+                <input type="password" id="regPass" class="input-field" placeholder="Kata Sandi" required>
+                <input type="password" id="regConfirmPass" class="input-field" placeholder="Verifikasi Kata Sandi" required>
+                
+                <button type="submit" class="btn-reg" id="btnRegister">Daftar Sekarang</button>
+                <p id="regMessage"></p>
+            </form>
+        </div>
+
+        <p class="footer-link">
+            Sudah punya akun? <a href="login.html">Masuk</a>
+        </p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAWLyrAPqCTJ7hXgc6D7wW_ePBbJXMG01k",
+            authDomain: "superfly-project.firebaseapp.com",
+            projectId: "superfly-project",
+            storageBucket: "superfly-project.firebasestorage.app",
+            messagingSenderId: "197736732141",
+            appId: "1:197736732141:web:4967ee0e29f8ba17dc43e4",
+            measurementId: "G-EBCBZDX5WY"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        const registerForm = document.getElementById('registerForm');
+        const regMessage = document.getElementById('regMessage');
+
+        registerForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('regEmail').value;
+            const pass = document.getElementById('regPass').value;
+            const confirmPass = document.getElementById('regConfirmPass').value;
+
+            // Reset message
+            regMessage.style.display = 'none';
+            regMessage.className = '';
+
+            if (pass !== confirmPass) {
+                regMessage.style.display = 'block';
+                regMessage.classList.add('error-msg');
+                regMessage.innerText = "Kata sandi tidak cocok!";
+                return;
+            }
+
+            try {
+                // 1. Buat User
+                await createUserWithEmailAndPassword(auth, email, pass);
+                
+                // 2. Sign Out Otomatis (Firebase langsung log in setelah register, kita batalkan)
+                await signOut(auth);
+
+                // 3. Beri feedback sukses
+                regMessage.style.display = 'block';
+                regMessage.classList.add('success-msg');
+                regMessage.innerText = "Akun berhasil dibuat! Mengalihkan ke halaman login...";
+
+                // 4. Redirect ke login setelah 2 detik
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 2000);
+
+            } catch (error) {
+                regMessage.style.display = 'block';
+                regMessage.classList.add('error-msg');
+                regMessage.innerText = "Gagal daftar. Email mungkin sudah digunakan.";
+            }
+        };
+    </script>
+</body>
+</html>

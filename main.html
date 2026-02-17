@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuperFly | Elite Collection</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        @font-face {
+            font-family: 'Nourd';
+            src: url('nourd-bold.woff2') format('woff2');
+            font-weight: bold;
+        }
+
+        :root {
+            --bg-color: #ffffff;
+            --text-main: #1d1d1f;
+            --text-gray: #86868b;
+            --accent: #000000; /* Stealth Black */
+            --nourd: 'Nourd', 'Inter', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            padding-bottom: 110px;
+        }
+
+        /* --- HEADER --- */
+        header {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            padding: 16px 24px;
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 1000;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            /* Animasi Smooth Header */
+            animation: slideDown 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+        }
+
+        @keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
+
+        .brand-logo { font-family: var(--nourd); font-size: 1.3rem; letter-spacing: -0.5px; text-transform: uppercase; }
+
+        /* --- SEARCH --- */
+        .search-section { padding: 20px 24px 10px; }
+        .search-box {
+            background: #f5f5f7; padding: 12px 18px; border-radius: 14px;
+            display: flex; align-items: center; gap: 12px;
+            transition: 0.4s cubic-bezier(0.2, 1, 0.3, 1);
+        }
+        .search-box:focus-within { background: #eeeeee; transform: translateY(-2px); }
+        .search-box input { border: none; background: none; outline: none; width: 100%; font-size: 0.95rem; }
+
+        .sec-title { 
+            padding: 10px 24px; font-family: var(--nourd); font-size: 0.8rem; 
+            color: var(--text-gray); text-transform: uppercase; letter-spacing: 1px;
+            animation: fadeIn 1s ease forwards;
+        }
+
+        /* --- BEST SELLER CAROUSEL --- */
+        .carousel-wrapper { padding: 0 20px; position: relative; margin-bottom: 10px; }
+        .carousel-container {
+            width: 100%; aspect-ratio: 4 / 2; border-radius: 24px;
+            overflow: hidden; position: relative; background: #eee;
+            /* Smooth Entrance */
+            animation: zoomIn 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+        }
+        @keyframes zoomIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+        .carousel-track { display: flex; width: 100%; height: 100%; transition: transform 0.8s cubic-bezier(0.6, 0, 0.4, 1); }
+        .carousel-slide { min-width: 100%; height: 100%; position: relative; cursor: pointer; }
+        .carousel-slide img { width: 100%; height: 100%; object-fit: cover; transition: 1.5s ease; }
+        .carousel-slide:hover img { transform: scale(1.05); }
+
+        .carousel-dots {
+            position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 8px; z-index: 10;
+        }
+        .dot { width: 6px; height: 6px; background: rgba(0, 0, 0, 0.1); border-radius: 50%; transition: 0.5s cubic-bezier(0.2, 1, 0.3, 1); }
+        .dot.active { background: #000; width: 18px; border-radius: 10px; }
+
+        /* --- PRODUCT GRID --- */
+        .product-section { padding: 0 20px; }
+        .grid { display: flex; flex-direction: column; gap: 20px; }
+
+        .product-card {
+            position: relative; width: 100%; aspect-ratio: 4 / 2;
+            border-radius: 24px; overflow: hidden; background: #f0f0f0; cursor: pointer;
+            transition: 0.5s cubic-bezier(0.2, 1, 0.3, 1);
+        }
+        .product-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+        .product-card:active { transform: scale(0.97); }
+        .img-container { width: 100%; height: 100%; }
+        .img-container img { width: 100%; height: 100%; object-fit: cover; transition: 0.8s; }
+
+        .product-info {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            padding: 24px 28px;
+            background: linear-gradient(to top right, rgba(0,0,0,0.7) 0%, transparent 100%);
+            display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start;
+            transition: 0.4s;
+        }
+        .product-info h3 { font-family: var(--nourd); font-size: 1.3rem; color: #ffffff; text-transform: uppercase; margin-bottom: 2px; }
+        .product-info p { font-size: 0.75rem; color: rgba(255,255,255,0.7); }
+
+        .badge {
+            position: absolute; top: 20px; right: 24px;
+            background: #000; color: white; padding: 4px 12px;
+            border-radius: 8px; font-size: 0.6rem; font-weight: 800; text-transform: uppercase;
+            z-index: 5;
+        }
+
+        /* --- NAV BAR --- */
+        nav {
+            position: fixed; bottom: 0; width: 100%; background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(15px); display: flex; justify-content: space-around;
+            padding: 12px 0 28px; border-top: 1px solid rgba(0,0,0,0.05); z-index: 1000;
+            animation: slideUp 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        nav a { color: var(--text-gray); text-decoration: none; font-size: 0.65rem; text-align: center; transition: 0.3s; }
+        nav a.active { color: var(--accent); transform: translateY(-2px); }
+        nav i { display: block; font-size: 1.2rem; margin-bottom: 4px; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); filter: blur(5px); } to { opacity: 1; transform: translateY(0); filter: blur(0); } }
+        .animate { animation: fadeIn 0.8s cubic-bezier(0.2, 1, 0.3, 1) forwards; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div style="display: flex; flex-direction: column;">
+            <div class="brand-logo">SUPERFLY</div>
+            <div id="userGreeting" style="font-size: 0.72rem; color: var(--text-gray); margin-top: 2px; font-weight: 500;">
+                Halo! Beli apa kamu hari ini?
+            </div>
+        </div>
+        </header>
+
+    <div class="search-section">
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="searchInput" placeholder="Cari Koleksi...">
+        </div>
+    </div>
+
+    <div id="bestSellerWrapper">
+        <h2 class="sec-title">Best Sellers</h2>
+        <div class="carousel-wrapper">
+            <div class="carousel-container">
+                <div class="carousel-track" id="carouselTrack">
+                    <div class="carousel-slide" onclick="window.location.href='product.html?id=aero-phone-z'">
+                        <span class="badge">Trending</span>
+                        <img src="./hp1.png" onerror="this.src='https://via.placeholder.com/800x400?text=HP1+Not+Found'">
+                        <div class="product-info">
+                            <h3>Aero Phone Z</h3>
+                            <p>Ultimate Experience</p>
+                        </div>
+                    </div>
+                    <div class="carousel-slide" onclick="window.location.href='product.html?id=flybook-m1'">
+                        <span class="badge">Elite</span>
+                        <img src="./laptop2.png" onerror="this.src='https://via.placeholder.com/800x400?text=Laptop2+Not+Found'">
+                        <div class="product-info">
+                            <h3>FlyBook M1</h3>
+                            <p>Pro Power Anywhere</p>
+                        </div>
+                    </div>
+                    <div class="carousel-slide" onclick="window.location.href='product.html?id=nova-runner'">
+                        <span class="badge">Hot</span>
+                        <img src="./sepatu3.png" onerror="this.src='https://via.placeholder.com/800x400?text=Sepatu3+Not+Found'">
+                        <div class="product-info">
+                            <h3>Nova Runner</h3>
+                            <p>Zero Gravity Comfort</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-dots" id="carouselDots">
+                    <div class="dot active"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="sec-title">Explore All</h2>
+    <div class="product-section">
+        <div class="grid" id="productGrid"></div>
+    </div>
+
+    <nav>
+        <a href="#" class="active"><i class="fa-solid fa-house"></i>Home</a>
+        <a href="cart.html"><i class="fa-solid fa-cart-shopping"></i>Cart</a>
+        <a href="account.html"><i class="fa-solid fa-user"></i>Account</a>
+    </nav>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyAWLyrAPqCTJ7hXgc6D7wW_ePBbJXMG01k",
+            authDomain: "superfly-project.firebaseapp.com",
+            projectId: "superfly-project",
+            storageBucket: "superfly-project.firebasestorage.app",
+            messagingSenderId: "197736732141",
+            appId: "1:197736732141:web:4967ee0e29f8ba17dc43e4",
+            measurementId: "G-EBCBZDX5WY"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const greetingElement = document.getElementById('userGreeting');
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const firstName = user.displayName ? user.displayName.split(' ')[0] : "Sobat";
+                greetingElement.innerHTML = `${firstName} — Halo ${firstName}! Beli apa kamu hari ini?`;
+            }
+        });
+    </script>
+
+    <script>
+        const products = [
+            { id: "aero-phone-z", name: "Aero Phone Z", subtitle: "Ultimate Experience", img: "./hp1.png" },
+            { id: "flybook-m1", name: "FlyBook M1", subtitle: "Pro Power Anywhere", img: "./laptop2.png" },
+            { id: "nova-runner", name: "Nova Runner", subtitle: "Zero Gravity Comfort", img: "./sepatu3.png" },
+            { id: "produk1", name: "Aero Glass 17", subtitle: "Visionary Smartphone", img: "./produk1.png" },
+            { id: "produk2", name: "FlyBook Ultra", subtitle: "Next-gen Computing", img: "./produk2.png" },
+            { id: "produk3", name: "Sonic Shell X", subtitle: "Immersive Audio", img: "./produk3.png" },
+            { id: "produk4", name: "Zenith Wrist", subtitle: "Timeless Precision", img: "./produk4.png" },
+            { id: "produk5", name: "Nova Sneakers", subtitle: "Zero Gravity Steps", img: "./produk5.png" },
+            { id: "produk6", name: "Titan Backpack", subtitle: "Rugged Elegance", img: "./produk6.png" },
+            { id: "produk7", name: "Ocular Pro", subtitle: "Reality Redefined", img: "./produk7.png" },
+            { id: "produk8", name: "Core Clicker", subtitle: "Tactile Mastery", img: "./produk8.png" },
+            { id: "produk9", name: "Lumina Beam", subtitle: "Smart Ambience", img: "./produk9.png" },
+            { id: "produk10", name: "Velocity Runner", subtitle: "Peak Performance", img: "./produk10.png" },
+            { id: "produk11", name: "Apex Wallet", subtitle: "Minimalist Carry", img: "./produk11.png" },
+            { id: "produk12", name: "Crono Spectre", subtitle: "Dark Edition Watch", img: "./produk12.png" }
+        ];
+
+        const grid = document.getElementById('productGrid');
+
+        function renderProducts(data) {
+            grid.innerHTML = '';
+            data.forEach((p, index) => {
+                const card = document.createElement('div');
+                card.className = 'product-card animate';
+                card.style.animationDelay = `${index * 0.08}s`;
+                card.onclick = () => window.location.href = `product.html?id=${p.id}`;
+                card.innerHTML = `
+                    <div class="img-container">
+                        <img src="${p.img}" onerror="this.src='https://via.placeholder.com/400x200?text=Image+Missing'">
+                    </div>
+                    <div class="product-info">
+                        <h3>${p.name}</h3>
+                        <p>${p.subtitle}</p>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        const track = document.getElementById('carouselTrack');
+        const dots = document.querySelectorAll('.dot');
+        let currentSlide = 0;
+
+        function updateCarousel() {
+            track.style.transform = `translateX(-${currentSlide * 100}%)`;
+            dots.forEach((dot, i) => dot.classList.toggle('active', i === currentSlide));
+        }
+
+        setInterval(() => {
+            currentSlide = (currentSlide + 1) % 3;
+            updateCarousel();
+        }, 4000);
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const kw = e.target.value.toLowerCase();
+            const filtered = products.filter(p => p.name.toLowerCase().includes(kw));
+            renderProducts(filtered);
+            
+            const wrapper = document.getElementById('bestSellerWrapper');
+            if(kw) {
+                wrapper.style.opacity = '0';
+                setTimeout(() => wrapper.style.display = 'none', 300);
+            } else {
+                wrapper.style.display = 'block';
+                setTimeout(() => wrapper.style.opacity = '1', 10);
+            }
+        });
+
+        renderProducts(products);
+    </script>
+</body>
+</html>

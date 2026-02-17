@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart | SuperFly</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        @font-face { font-family: 'Nourd'; src: url('nourd-bold.woff2') format('woff2'); font-weight: bold; }
+        :root { --bg: #ffffff; --text: #1d1d1f; --gray: #f5f5f7; --accent: #000000; --nourd: 'Nourd', sans-serif; }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); padding-bottom: 100px; }
+
+        header { padding: 25px; display: flex; align-items: center; gap: 20px; position: sticky; top: 0; background: #fff; z-index: 10; }
+        header h1 { font-family: var(--nourd); font-size: 1.2rem; text-transform: uppercase; }
+        .back-btn { font-size: 1.2rem; cursor: pointer; }
+
+        .container { padding: 0 24px; }
+
+        /* --- CART LIST --- */
+        #cartList { margin-top: 10px; }
+        .cart-item { 
+            display: flex; align-items: center; gap: 15px; 
+            padding: 15px 0; border-bottom: 1px solid rgba(0,0,0,0.05); 
+            animation: fadeIn 0.5s ease;
+        }
+        .cart-item img { width: 80px; height: 80px; border-radius: 12px; object-fit: cover; background: var(--gray); }
+        .item-detail { flex: 1; }
+        .item-detail h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 4px; }
+        .item-detail p { font-size: 0.85rem; color: #86868b; }
+        
+        .remove-btn { color: #ff3b30; font-size: 0.9rem; cursor: pointer; padding: 5px; }
+
+        /* --- EMPTY STATE --- */
+        .empty-cart { text-align: center; padding: 50px 20px; display: none; }
+        .empty-cart i { font-size: 3rem; color: #d2d2d7; margin-bottom: 15px; }
+
+        /* --- FOOTER TOTAL --- */
+        .cart-footer { 
+            position: fixed; bottom: 0; width: 100%; background: #fff; 
+            padding: 20px 24px 35px; border-top: 1px solid rgba(0,0,0,0.05);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .total-info span { display: block; font-size: 0.8rem; color: #86868b; }
+        .total-info h2 { font-size: 1.2rem; font-weight: 800; }
+        
+        .checkout-btn { 
+            background: var(--accent); color: #fff; padding: 15px 30px; 
+            border-radius: 14px; border: none; font-weight: 700; cursor: pointer;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <header>
+        <i class="fa-solid fa-chevron-left back-btn" onclick="window.location.href='main.html'"></i>
+        <h1>Your Cart</h1>
+    </header>
+
+    <div class="container">
+        <div id="cartList"></div>
+
+        <div id="emptyState" class="empty-cart">
+            <i class="fa-solid fa-bag-shopping"></i>
+            <p>Keranjangmu masih kosong.</p>
+            <button onclick="window.location.href='main.html'" style="margin-top:15px; background:none; border:1px solid black; padding:10px 20px; border-radius:8px;">Mulai Belanja</button>
+        </div>
+    </div>
+
+    <div class="cart-footer" id="cartFooter">
+        <div class="total-info">
+            <span>Total Bayar</span>
+            <h2 id="grandTotal">Rp 0</h2>
+        </div>
+        <button class="checkout-btn" onclick="goToCheckout()">Checkout</button>
+    </div>
+
+    <script>
+        function loadCart() {
+            const cart = JSON.parse(localStorage.getItem('sf_cart')) || [];
+            const listContainer = document.getElementById('cartList');
+            const emptyState = document.getElementById('emptyState');
+            const footer = document.getElementById('cartFooter');
+            const totalElement = document.getElementById('grandTotal');
+
+            if (cart.length === 0) {
+                listContainer.innerHTML = '';
+                emptyState.style.display = 'block';
+                footer.style.display = 'none';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            footer.style.display = 'flex';
+            listContainer.innerHTML = '';
+
+            let totalHarga = 0;
+
+            cart.forEach((item, index) => {
+                // Konversi harga string "Rp 15.000.000" ke angka untuk dijumlahkan
+                const numericPrice = parseInt(item.price.replace(/[^0-9]/g, ''));
+                totalHarga += numericPrice;
+
+                const itemHTML = `
+                    <div class="cart-item">
+                        <img src="${item.img}" alt="${item.name}">
+                        <div class="item-detail">
+                            <h3>${item.name}</h3>
+                            <p>${item.price}</p>
+                        </div>
+                        <div class="remove-btn" onclick="removeItem(${index})">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </div>
+                    </div>
+                `;
+                listContainer.innerHTML += itemHTML;
+            });
+
+            totalElement.innerText = `Rp ${totalHarga.toLocaleString('id-ID')}`;
+        }
+
+        function removeItem(index) {
+            let cart = JSON.parse(localStorage.getItem('sf_cart')) || [];
+            cart.splice(index, 1); // Hapus item berdasarkan urutan
+            localStorage.setItem('sf_cart', JSON.stringify(cart));
+            loadCart(); // Reload tampilan
+        }
+
+        function goToCheckout() {
+            // Kita ambil produk pertama saja untuk disimulasikan ke checkout.html
+            const cart = JSON.parse(localStorage.getItem('sf_cart')) || [];
+            if(cart.length > 0) {
+                localStorage.setItem('sf_checkout', JSON.stringify(cart[0]));
+                window.location.href = 'checkout.html';
+            }
+        }
+
+        // Jalankan saat halaman dibuka
+        window.onload = loadCart;
+    </script>
+</body>
+</html>

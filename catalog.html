@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuperFly | Best Sellers</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        @font-face { font-family: 'Nourd'; src: url('nourd-bold.woff2') format('woff2'); font-weight: bold; }
+        :root { --bg: #000000; --nourd: 'Nourd', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: #fff; overflow: hidden; height: 100dvh; }
+        
+        #main-bg { 
+            position: absolute; 
+            top: 0; left: 0; width: 100%; height: 100%; 
+            background-size: cover; 
+            background-position: center; 
+            transition: background-image 1.2s cubic-bezier(0.4, 0, 0.2, 1), transform 1.2s ease;
+            z-index: 0; 
+        }
+        
+        #main-bg::after { 
+            content: ''; 
+            position: absolute; 
+            top: 0; left: 0; width: 100%; height: 100%; 
+            background: linear-gradient(to right, rgba(0,0,0,0.8) 20%, transparent 100%); 
+        }
+
+        .dock-menu { 
+            position: absolute; 
+            top: 50%; 
+            left: 20px; 
+            transform: translateY(-50%); 
+            display: flex; 
+            flex-direction: column; 
+            gap: 35px; 
+            z-index: 10; 
+        }
+        
+        .nav-item { 
+            width: 45px; height: 45px; 
+            background: rgba(255,255,255,0.1); 
+            border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            cursor: pointer; 
+            border: 1px solid rgba(255,255,255,0.2); 
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            font-weight: 900; 
+            position: relative;
+            font-size: 0.8rem;
+        }
+        
+        .nav-item:nth-child(1), .nav-item:nth-child(3) { left: 25px; }
+        .nav-item:nth-child(2) { left: 45px; }
+        
+        .nav-item.active { 
+            background: #fff; 
+            color: #000; 
+            transform: scale(1.25); 
+            box-shadow: 0 0 25px rgba(255,255,255,0.4);
+            border-color: #fff;
+        }
+
+        .info-panel { 
+            position: absolute; 
+            left: 130px; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            z-index: 10; 
+            max-width: 250px; 
+        }
+
+        .product-info { 
+            display: none; 
+            animation: smoothFadeIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; 
+        }
+        
+        .product-info.active { display: block; }
+        
+        @keyframes smoothFadeIn { 
+            from { opacity: 0; transform: translateX(-20px); filter: blur(5px); } 
+            to { opacity: 1; transform: translateX(0); filter: blur(0); } 
+        }
+        
+        h2 { font-family: var(--nourd); font-size: 2.2rem; text-transform: uppercase; margin-bottom: 8px; letter-spacing: -1px; }
+        p { color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-bottom: 20px; line-height: 1.4; }
+        
+        .btn-more { 
+            display: inline-block;
+            border: 1px solid #fff; 
+            color: #fff; 
+            padding: 10px 20px; 
+            text-decoration: none; 
+            font-size: 0.75rem; 
+            font-weight: 700; 
+            border-radius: 4px; 
+            transition: 0.3s;
+            text-transform: uppercase;
+        }
+        .btn-more:hover { background: #fff; color: #000; transform: translateY(-2px); }
+
+        .bg-animate { animation: bgPulse 8s infinite alternate; }
+        @keyframes bgPulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.08); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="main-bg" class="bg-animate"></div>
+
+    <div class="dock-menu">
+        <div class="nav-item active" onclick="manualShow(0)">1</div>
+        <div class="nav-item" onclick="manualShow(1)">2</div>
+        <div class="nav-item" onclick="manualShow(2)">3</div>
+    </div>
+
+    <div class="info-panel">
+        <div class="product-info active">
+            <h2>Super HP</h2>
+            <p>Smartphone flagship dengan performa gila dan kamera kelas profesional.</p>
+            <a href="main.html" class="btn-more">MORE PRODUCTS</a>
+        </div>
+        <div class="product-info">
+            <h2>Laptop Pro</h2>
+            <p>Laptop paling tipis dan kencang untuk kebutuhan produktivitas tinggi.</p>
+            <a href="main.html" class="btn-more">MORE PRODUCTS</a>
+        </div>
+        <div class="product-info">
+            <h2>Fly Shoe</h2>
+            <p>Sepatu limited edition dengan kenyamanan maksimal dan desain ikonik.</p>
+            <a href="main.html" class="btn-more">MORE PRODUCTS</a>
+        </div>
+    </div>
+
+    <script>
+        const imgs = ["hp1.png", "laptop2.png", "sepatu3.png"];
+        let currentIndex = 0;
+        let autoSlideInterval;
+
+        function showProduct(idx) {
+            currentIndex = idx;
+            const bg = document.getElementById('main-bg');
+            bg.style.backgroundImage = `url('${imgs[idx]}')`;
+            
+            document.querySelectorAll('.nav-item').forEach((item, i) => {
+                item.classList.toggle('active', i === idx);
+            });
+            
+            document.querySelectorAll('.product-info').forEach((info, i) => {
+                info.classList.toggle('active', i === idx);
+            });
+        }
+
+        // Fungsi manual kalau user klik angka
+        function manualShow(idx) {
+            showProduct(idx);
+            resetTimer(); // Reset timer pas diklik manual biar gak "balapan"
+        }
+
+        function startTimer() {
+            autoSlideInterval = setInterval(() => {
+                currentIndex = (currentIndex + 1) % imgs.length;
+                showProduct(currentIndex);
+            }, 5000); // Ganti slide tiap 5 detik
+        }
+
+        function resetTimer() {
+            clearInterval(autoSlideInterval);
+            startTimer();
+        }
+
+        window.onload = () => {
+            showProduct(0);
+            startTimer();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masuk | SuperFly</title>
+    <style>
+        :root {
+            --bg-light: #f5f5f7;
+            --text-main: #1d1d1f;
+            --text-gray: #6e6e73;
+            --accent: #000000;
+            --error: #ff3b30;
+            --glass: rgba(255, 255, 255, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.8);
+        }
+
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: #e5e5e7;
+            min-height: 100vh; 
+            display: flex; 
+            justify-content: center;
+            align-items: center; 
+            padding: 24px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* --- BACKGROUND ANIMASI (Biar Gak Polos) --- */
+        .bg-elements {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0;
+            background: radial-gradient(circle at 0% 0%, #ffffff 0%, #e5e5e7 50%, #d2d2d7 100%);
+        }
+
+        .blob {
+            position: absolute;
+            width: 500px; height: 500px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(210,210,215,0.5) 100%);
+            filter: blur(80px);
+            border-radius: 50%;
+            z-index: 0;
+            animation: move 20s infinite alternate;
+        }
+        .blob-1 { top: -100px; right: -100px; }
+        .blob-2 { bottom: -150px; left: -100px; animation-delay: -5s; }
+
+        @keyframes move {
+            from { transform: translate(0, 0) rotate(0deg); }
+            to { transform: translate(50px, 100px) rotate(30deg); }
+        }
+
+        /* Tekstur Grain/Noise */
+        .noise {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1; opacity: 0.04; pointer-events: none;
+            background: url('https://grainy-gradients.vercel.app/noise.svg');
+        }
+
+        .login-wrapper {
+            position: relative;
+            z-index: 10;
+            width: 100%; max-width: 400px; 
+            text-align: center;
+            margin: auto;
+        }
+
+        .logo-text { 
+            font-size: 3rem; 
+            font-weight: 800; 
+            color: var(--text-main); 
+            letter-spacing: -3px; 
+            margin-bottom: 5px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05));
+        }
+        .logo-text span { color: #000; }
+
+        .subtitle { 
+            font-size: 0.9rem; 
+            color: var(--text-gray); 
+            margin-bottom: 35px; 
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        /* --- THE BOX (PREMIUM GLASS) --- */
+        .glass-box {
+            background: var(--glass);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 38px;
+            padding: 45px 35px;
+            box-shadow: 
+                0 4px 6px rgba(0,0,0,0.01),
+                0 25px 50px rgba(0,0,0,0.1);
+            animation: boxEntrance 1s cubic-bezier(0.2, 1, 0.2, 1);
+        }
+
+        @keyframes boxEntrance {
+            from { opacity: 0; transform: scale(0.9) translateY(30px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        h2 { font-size: 1.6rem; font-weight: 800; color: var(--text-main); margin-bottom: 30px; letter-spacing: -0.5px; }
+
+        .form-container { display: flex; flex-direction: column; gap: 14px; }
+
+        .input-field {
+            width: 100%; padding: 20px; 
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(0, 0, 0, 0.05); 
+            border-radius: 20px; font-size: 1rem;
+            color: var(--text-main); transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none; 
+            background: #ffffff; 
+            border-color: var(--accent);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+
+        .btn-login {
+            width: 100%; padding: 20px; 
+            background: var(--accent);
+            color: #ffffff; border: none; border-radius: 20px;
+            font-size: 1rem; font-weight: 700; margin-top: 10px;
+            cursor: pointer; transition: 0.4s cubic-bezier(0.2, 1, 0.3, 1);
+        }
+
+        .btn-login:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0,0,0,0.2); }
+        .btn-login:active { transform: scale(0.97); }
+
+        .footer-link { 
+            margin-top: 35px; font-size: 0.95rem; 
+            color: var(--text-gray); 
+        }
+        .footer-link a { color: var(--text-main); text-decoration: none; font-weight: 700; border-bottom: 1.5px solid var(--accent); }
+
+        #errorMessage { color: var(--error); font-size: 0.85rem; margin-top: 15px; display: none; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+    <div class="bg-elements">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="noise"></div>
+    </div>
+
+    <div class="login-wrapper">
+        <h1 class="logo-text">SuperFly<span>.</span></h1>
+        <p class="subtitle">Experience the future of shopping.</p>
+        
+        <div class="glass-box">
+            <h2>Masuk Akun</h2>
+
+            <form id="loginForm" class="form-container">
+                <input type="email" id="loginEmail" class="input-field" placeholder="Email" required>
+                <input type="password" id="loginPass" class="input-field" placeholder="Kata Sandi" required>
+                
+                <button type="submit" class="btn-login" id="btnLogin">Masuk Sekarang</button>
+                <p id="errorMessage"></p>
+            </form>
+        </div>
+
+        <p class="footer-link">
+            Belum punya akun? <a href="register.html">Daftar</a>
+        </p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAWLyrAPqCTJ7hXgc6D7wW_ePBbJXMG01k",
+            authDomain: "superfly-project.firebaseapp.com",
+            projectId: "superfly-project",
+            storageBucket: "superfly-project.firebasestorage.app",
+            messagingSenderId: "197736732141",
+            appId: "1:197736732141:web:4967ee0e29f8ba17dc43e4",
+            measurementId: "G-EBCBZDX5WY"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        const loginForm = document.getElementById('loginForm');
+        const errorMessage = document.getElementById('errorMessage');
+
+        loginForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const pass = document.getElementById('loginPass').value;
+
+            try {
+                await setPersistence(auth, browserLocalPersistence);
+                await signInWithEmailAndPassword(auth, email, pass);
+                window.location.href = 'onboarding.html'; 
+            } catch (error) {
+                errorMessage.style.display = 'block';
+                errorMessage.innerText = "Email atau password salah!";
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuperFly | Secure Checkout</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        @font-face { font-family: 'Nourd'; src: url('nourd-bold.woff2') format('woff2'); font-weight: bold; }
+        
+        :root { 
+            --bg: #ffffff; 
+            --text: #1d1d1f; 
+            --gray: #86868b; 
+            --accent: #000000; 
+            --success: #28a745;
+            --nourd: 'Nourd', 'Inter', sans-serif; 
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        body { font-family: 'Inter', sans-serif; background: #f5f5f7; color: var(--text); padding-bottom: 40px; }
+
+        header { 
+            padding: 20px; display: flex; justify-content: space-between; align-items: center; 
+            background: var(--bg); border-bottom: 1px solid rgba(0,0,0,0.05);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .back-btn { font-size: 1.2rem; cursor: pointer; color: var(--text); }
+
+        .container { padding: 24px; max-width: 600px; margin: 0 auto; }
+
+        /* --- PRODUCT SUMMARY --- */
+        .card { background: white; border-radius: 24px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(0,0,0,0.03); }
+        .checkout-item { display: flex; gap: 20px; align-items: center; }
+        .checkout-item img { width: 80px; height: 80px; border-radius: 16px; object-fit: cover; background: #f5f5f7; }
+        .item-info h2 { font-family: var(--nourd); font-size: 1.1rem; text-transform: uppercase; }
+        .item-info p { color: var(--gray); font-size: 0.9rem; margin-top: 4px; }
+
+        /* --- PAYMENT INFO --- */
+        .section-title { font-family: var(--nourd); font-size: 0.75rem; letter-spacing: 1.5px; color: var(--gray); margin: 30px 0 15px; text-transform: uppercase; }
+        
+        .payment-option { 
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 18px; background: white; border-radius: 16px; margin-bottom: 10px;
+            border: 2px solid transparent; cursor: pointer; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        /* Style saat dipilih */
+        .payment-option.active { border: 2px solid var(--accent); }
+        .payment-option i.check-icon { font-size: 1.2rem; color: #ddd; }
+        .payment-option.active i.check-icon { color: var(--accent); }
+
+        /* --- TOTAL AREA --- */
+        .price-summary { margin-top: 30px; }
+        .row { display: flex; justify-content: space-between; margin-bottom: 10px; color: var(--gray); font-size: 0.95rem; }
+        .row.total { color: var(--text); font-weight: 800; font-size: 1.2rem; border-top: 1px solid #ddd; padding-top: 15px; margin-top: 15px; }
+
+        /* --- BUTTON --- */
+        .pay-btn { 
+            width: 100%; padding: 20px; border-radius: 18px; background: var(--accent);
+            color: white; border: none; font-weight: 700; font-size: 1rem;
+            margin-top: 30px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .pay-btn:active { transform: scale(0.98); }
+
+        /* --- SUCCESS SCREEN --- */
+        #successScreen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; z-index: 1000; display: none;
+            flex-direction: column; align-items: center; justify-content: center;
+            padding: 20px;
+        }
+
+        .anim-container {
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.8s cubic-bezier(0.7, 0, 0.3, 1);
+            width: 100%;
+        }
+
+        /* SVG Ceklis */
+        .checkmark-svg { width: 70px; height: 70px; flex-shrink: 0; }
+        .circle { 
+            stroke-dasharray: 166; stroke-dashoffset: 166; stroke-width: 2; 
+            stroke: var(--success); fill: none; animation: strokeAnim 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards; 
+        }
+        .check { 
+            stroke-dasharray: 48; stroke-dashoffset: 48; stroke: var(--success); 
+            stroke-width: 3; fill: none; animation: strokeAnim 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.7s forwards; 
+        }
+        @keyframes strokeAnim { 100% { stroke-dashoffset: 0; } }
+
+        /* Teks Berhasil */
+        .success-msg {
+            font-family: var(--nourd); 
+            font-size: 1.2rem; 
+            color: var(--success);
+            white-space: nowrap; 
+            overflow: hidden; 
+            width: 0; 
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.7, 0, 0.3, 1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        #successScreen.active .anim-container { transform: translateX(-10px); }
+        #successScreen.active .success-msg { 
+            width: 220px; 
+            opacity: 1; 
+            margin-left: 15px; 
+        }
+
+        #successScreen .btn-back-home {
+            position: absolute; bottom: 60px; opacity: 0; transform: translateY(20px);
+            transition: 0.8s ease 1.5s; 
+            text-align: center;
+        }
+        #successScreen.active .btn-back-home { opacity: 1; transform: translateY(0); }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="back-btn" onclick="history.back()"><i class="fa-solid fa-xmark"></i></div>
+        <div style="font-family: 'Nourd'; font-size: 0.8rem; letter-spacing: 1px;">CHECKOUT</div>
+        <div style="width: 20px;"></div>
+    </header>
+
+    <div class="container">
+        <h2 class="section-title">Order Summary</h2>
+        <div class="card" id="productCard">
+            <div class="checkout-item">
+                <img id="orderImg" src="" alt="">
+                <div class="item-info">
+                    <h2 id="orderName">Loading...</h2>
+                    <p id="orderPrice">...</p>
+                </div>
+             </div>
+        </div>
+
+        <h2 class="section-title">Payment Method</h2>
+        
+        <div class="payment-option active" onclick="selectPayment(this)">
+            <span><i class="fa-solid fa-credit-card"></i> &nbsp; SuperFly Card</span>
+            <i class="fa-solid fa-circle-check check-icon"></i>
+        </div>
+
+        <div class="payment-option" onclick="selectPayment(this)">
+            <span><i class="fa-brands fa-apple-pay"></i> &nbsp; Apple Pay</span>
+            <i class="fa-solid fa-circle-check check-icon"></i>
+        </div>
+
+        <div class="price-summary">
+            <div class="row"><span>Subtotal</span> <span id="subtotal">...</span></div>
+            <div class="row"><span>Shipping</span> <span>Free</span></div>
+            <div class="row total"><span>Total</span> <span id="grandTotal">...</span></div>
+        </div>
+
+        <button class="pay-btn" onclick="processPayment()">Confirm & Pay</button>
+    </div>
+
+    <div id="successScreen">
+        <div class="anim-container">
+            <svg class="checkmark-svg" viewBox="0 0 52 52">
+                <circle class="circle" cx="26" cy="26" r="25"/>
+                <path class="check" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+            </svg>
+            <div class="success-msg">Checkout Berhasil</div>
+        </div>
+        <div class="btn-back-home">
+            <p style="color: gray; margin-bottom: 20px; font-size: 0.9rem;">Pesanan Anda sudah masuk dalam sistem.</p>
+            <button onclick="window.location.href='main.html'" style="padding: 16px 40px; border-radius: 100px; background: black; color: white; border: none; font-weight: 700; cursor: pointer; text-transform: uppercase; font-size: 0.85rem;">KEMBALI KE HOME</button>
+        </div>
+    </div>
+
+    <script>
+        const checkoutData = JSON.parse(localStorage.getItem('sf_checkout'));
+
+        if (checkoutData) {
+            document.getElementById('orderImg').src = checkoutData.img || checkoutData.image;
+            document.getElementById('orderName').innerText = checkoutData.name;
+            document.getElementById('orderPrice').innerText = checkoutData.price;
+            document.getElementById('subtotal').innerText = checkoutData.price;
+            document.getElementById('grandTotal').innerText = checkoutData.price;
+        } else {
+            window.location.href = 'main.html';
+        }
+
+        // --- FUNGSI PILIH PEMBAYARAN ---
+        function selectPayment(element) {
+            // Hapus class 'active' dari semua opsi
+            document.querySelectorAll('.payment-option').forEach(opt => {
+                opt.classList.remove('active');
+            });
+            // Tambahkan class 'active' ke yang diklik
+            element.classList.add('active');
+        }
+
+        function processPayment() {
+            const newNotif = {
+                productName: checkoutData.name,
+                price: checkoutData.price,
+                date: new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })
+            };
+
+            let notifs = JSON.parse(localStorage.getItem('sf_notifications')) || [];
+            notifs.push(newNotif);
+            localStorage.setItem('sf_notifications', JSON.stringify(notifs));
+
+            localStorage.setItem('sf_notif_unread', 'true');
+
+            const screen = document.getElementById('successScreen');
+            screen.style.display = 'flex';
+            
+            setTimeout(() => {
+                screen.classList.add('active');
+                localStorage.removeItem('sf_checkout'); 
+            }, 100);
+        }
+    </script>
+</body>
+</html>

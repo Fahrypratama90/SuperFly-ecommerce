@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuperFly | Help Center</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+    <style>
+        @font-face { font-family: 'Nourd'; src: url('nourd-bold.woff2') format('woff2'); font-weight: bold; }
+        :root { 
+            --bg: #ffffff; --text: #1d1d1f; --gray: #86868b; --accent: #000000; 
+            --nourd: 'Nourd', sans-serif; --soft-bg: #f5f5f7;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        body { font-family: 'Inter', sans-serif; background: var(--soft-bg); color: var(--text); padding-bottom: 40px; }
+
+        /* --- HEADER --- */
+        header { 
+            padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; 
+            background: var(--bg); border-bottom: 1px solid rgba(0,0,0,0.05);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .back-btn { font-size: 1.2rem; cursor: pointer; transition: 0.2s; }
+        .back-btn:active { opacity: 0.5; }
+
+        .container { padding: 24px; max-width: 600px; margin: 0 auto; }
+
+        /* --- SEARCH BOX --- */
+        .search-container { margin-bottom: 30px; position: relative; }
+        .search-box { 
+            width: 100%; padding: 18px 20px 18px 52px; border-radius: 18px; 
+            border: 2px solid transparent; background: white; font-size: 0.95rem; 
+            font-family: 'Inter'; box-shadow: 0 10px 25px rgba(0,0,0,0.03);
+            transition: 0.3s;
+        }
+        .search-box:focus { border-color: var(--accent); outline: none; }
+        .search-container i { position: absolute; left: 22px; top: 50%; transform: translateY(-50%); color: var(--gray); font-size: 1.1rem; }
+
+        /* --- CONTACT CARDS --- */
+        .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 35px; }
+        .contact-card { 
+            background: white; padding: 24px 15px; border-radius: 22px; text-align: center;
+            border: 1px solid rgba(0,0,0,0.02); cursor: pointer; transition: 0.3s cubic-bezier(0.2, 1, 0.3, 1);
+        }
+        .contact-card:active { transform: scale(0.92); background: #fafafa; }
+        .contact-card i { font-size: 1.8rem; margin-bottom: 12px; color: var(--accent); display: block; }
+        .contact-card span { display: block; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* --- FAQ SECTION --- */
+        .section-title { 
+            font-family: var(--nourd); font-size: 0.7rem; letter-spacing: 2px; 
+            color: var(--gray); margin: 0 0 15px 5px; text-transform: uppercase; 
+        }
+        .faq-group { background: white; border-radius: 24px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.02); }
+        .faq-item { border-bottom: 1px solid #f2f2f7; transition: 0.3s; }
+        .faq-item:last-child { border-bottom: none; }
+        
+        .faq-header { 
+            padding: 22px; display: flex; justify-content: space-between; align-items: center; 
+            cursor: pointer;
+        }
+        .faq-header span { font-size: 0.95rem; font-weight: 600; padding-right: 15px; line-height: 1.4; }
+        .faq-header i { color: #ccc; font-size: 0.8rem; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        
+        .faq-content { 
+            max-height: 0; overflow: hidden; padding: 0 22px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+            color: var(--gray); font-size: 0.88rem; line-height: 1.6;
+        }
+
+        /* Active State */
+        .faq-item.active { background: #fafafa; }
+        .faq-item.active .faq-content { max-height: 150px; padding-bottom: 22px; }
+        .faq-item.active .faq-header i { transform: rotate(180deg); color: var(--accent); }
+
+        /* --- EMPTY STATE --- */
+        #emptySearch { display: none; text-align: center; padding: 40px 20px; color: var(--gray); font-size: 0.9rem; }
+
+        /* --- FOOTER --- */
+        .help-footer { margin-top: 50px; text-align: center; padding-bottom: 20px; }
+        .help-footer p { color: #ccc; font-size: 0.65rem; letter-spacing: 1px; text-transform: uppercase; font-weight: 700; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="back-btn" onclick="history.back()"><i class="fa-solid fa-arrow-left"></i></div>
+        <div style="font-family: 'Nourd'; font-size: 0.8rem; letter-spacing: 2px;">SUPPORT</div>
+        <div style="width: 20px;"></div>
+    </header>
+
+    <div class="container">
+        <div class="search-container">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" class="search-box" id="searchInput" placeholder="Describe your issue...">
+        </div>
+
+        <div class="contact-grid">
+            <div class="contact-card" onclick="openEmail()">
+                <i class="fa-solid fa-envelope-open-text"></i>
+                <span>Email Us</span>
+            </div>
+            <div class="contact-card" onclick="openWA()">
+                <i class="fa-solid fa-comment-dots"></i>
+                <span>Live Chat</span>
+            </div>
+        </div>
+
+        <h2 class="section-title">Common Questions</h2>
+        <div class="faq-group" id="faqGroup">
+            <div class="faq-item">
+                <div class="faq-header">
+                    <span>How to track my order?</span>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </div>
+                <div class="faq-content">
+                    Head over to <b>Account > My Orders</b>. Click on your active order to see the real-time shipping status and tracking number.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-header">
+                    <span>What is the return policy?</span>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </div>
+                <div class="faq-content">
+                    We accept returns within 7 days of delivery. Items must be in original condition with all tags attached.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-header">
+                    <span>Payment security & Privacy</span>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </div>
+                <div class="faq-content">
+                    Your transactions are encrypted via SSL. We don't store your CVV or full card details. Security is our #1 priority.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-header">
+                    <span>Change shipping address?</span>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </div>
+                <div class="faq-content">
+                    Addresses can only be changed before the order is "Processed". Contact Live Chat immediately if you made a mistake.
+                </div>
+            </div>
+        </div>
+
+        <div id="emptySearch">No matching questions found.</div>
+
+        <div class="help-footer">
+            <p>SuperFly Assistant v1.0.4 • 2026</p>
+        </div>
+    </div>
+
+    <script>
+        // --- FAQ INTERACTION ---
+        document.querySelectorAll('.faq-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const currentItem = header.parentElement;
+                
+                // Close others
+                document.querySelectorAll('.faq-item').forEach(item => {
+                    if (item !== currentItem) item.classList.remove('active');
+                });
+
+                currentItem.classList.toggle('active');
+            });
+        });
+
+        // --- SEARCH ENGINE ---
+        const searchInput = document.getElementById('searchInput');
+        const faqItems = document.querySelectorAll('.faq-item');
+        const emptyState = document.getElementById('emptySearch');
+
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            let hasResults = false;
+
+            faqItems.forEach(item => {
+                const text = item.innerText.toLowerCase();
+                if (text.includes(term)) {
+                    item.style.display = 'block';
+                    hasResults = true;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            emptyState.style.display = hasResults ? 'none' : 'block';
+        });
+
+        // --- CONTACT HANDLERS (ANTI-ERROR) ---
+        function openEmail() {
+            const email = "support@superfly.com";
+            const subject = "Support Request - SuperFly";
+            const body = "Hi SuperFly Team,\n\nI need help with...";
+            window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        }
+
+        function openWA() {
+            const phone = "628123456789"; // Ganti nomor lo
+            const text = "Halo Admin SuperFly, saya butuh bantuan mengenai aplikasi.";
+            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
+        }
+    </script>
+</body>
+</html>
