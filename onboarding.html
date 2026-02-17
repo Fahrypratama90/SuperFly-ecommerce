@@ -10,40 +10,26 @@
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
         
         body, html { 
-            width: 100%; 
-            height: 100dvh; 
-            background: #000; 
-            color: #fff; 
-            font-family: 'Inter', sans-serif; 
-            overflow: hidden; 
+            width: 100%; height: 100dvh; 
+            background: #000; color: #fff; 
+            font-family: 'Inter', sans-serif; overflow: hidden; 
         }
 
         .slider { 
-            display: flex; 
-            width: 300%; 
-            height: 100%; 
+            display: flex; width: 300%; height: 100%; 
             transition: transform 1.1s cubic-bezier(0.65, 0, 0.35, 1); 
         }
 
         .slide { 
-            width: 33.3333%; 
-            height: 100%; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: flex-end; 
-            padding: 0 10% 160px; /* Jarak dari bawah */
-            position: relative;
-            background-size: cover;
-            background-position: center;
+            width: 33.3333%; height: 100%; 
+            display: flex; flex-direction: column; 
+            justify-content: flex-end; padding: 0 10% 160px; 
+            position: relative; background-size: cover; background-position: center;
         }
 
-        /* Gradient overlay biar teks kebaca */
         .slide::after {
-            content: '';
-            position: absolute;
-            bottom: 0; left: 0; width: 100%; height: 60%;
-            background: linear-gradient(to top, rgba(0,0,0,1) 20%, transparent 100%);
-            z-index: 1;
+            content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 60%;
+            background: linear-gradient(to top, rgba(0,0,0,1) 20%, transparent 100%); z-index: 1;
         }
 
         .slide:nth-child(1) { background-image: url('onboarding1.png'); }
@@ -52,34 +38,28 @@
 
         .content { z-index: 5; position: relative; }
 
-        /* PERBAIKAN UKURAN TEKS */
+        /* --- ANIMASI BARU --- */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); filter: blur(10px); }
+            to { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
+
+        .slide.active h1 { animation: fadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        .slide.active p { animation: fadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0.2s forwards; opacity: 0; }
+
         h1 { 
-            font-size: clamp(2rem, 8vw, 3rem); /* Ukuran lebih proporsional */
-            font-weight: 900; 
-            line-height: 1.1; 
-            margin-bottom: 12px; 
-            text-transform: uppercase; 
-            letter-spacing: -1px;
+            font-size: clamp(2rem, 8vw, 3rem); font-weight: 900; 
+            line-height: 1.1; margin-bottom: 12px; text-transform: uppercase; letter-spacing: -1px;
         }
 
         p { 
-            font-size: 0.95rem; /* Ukuran standar yang nyaman dibaca */
-            color: rgba(255,255,255,0.7); 
-            max-width: 280px; 
-            line-height: 1.5;
-            margin-bottom: 25px; 
+            font-size: 0.95rem; color: rgba(255,255,255,0.7); 
+            max-width: 280px; line-height: 1.5; margin-bottom: 25px; 
         }
 
         .footer { 
-            position: fixed; 
-            bottom: 45px; 
-            left: 0; 
-            width: 100%; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            gap: 25px; 
-            z-index: 10; 
+            position: fixed; bottom: 45px; left: 0; width: 100%; 
+            display: flex; flex-direction: column; align-items: center; gap: 25px; z-index: 10; 
         }
 
         .dots { display: flex; gap: 10px; }
@@ -87,30 +67,20 @@
         .dot.active { width: 28px; background: #fff; border-radius: 10px; }
 
         .main-btn { 
-            width: 85%; 
-            max-width: 380px; 
-            background: #fff; 
-            color: #000; 
-            border: none; 
-            padding: 18px; 
-            border-radius: 100px; 
-            font-weight: 800; 
-            font-size: 0.95rem;
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            gap: 12px; 
-            cursor: pointer;
-            transition: 0.2s;
+            width: 85%; max-width: 380px; background: #fff; color: #000; 
+            border: none; padding: 18px; border-radius: 100px; 
+            font-weight: 800; font-size: 0.95rem;
+            display: flex; justify-content: center; align-items: center; gap: 12px; 
+            cursor: pointer; transition: 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
-        .main-btn:active { transform: scale(0.96); }
+        .main-btn:active { transform: scale(0.92); }
     </style>
 </head>
 <body>
 
     <div class="slider" id="slider">
-        <div class="slide">
+        <div class="slide active">
             <div class="content">
                 <h1>Elevate<br>Style.</h1>
                 <p>Koleksi fashion premium untuk standar hidup yang lebih tinggi.</p>
@@ -147,13 +117,20 @@
         const actionBtn = document.getElementById('actionBtn');
         const btnText = document.getElementById('btnText');
         const dots = document.querySelectorAll('.dot');
+        const slides = document.querySelectorAll('.slide');
         let currentSlide = 0;
 
         actionBtn.onclick = () => {
             if (currentSlide < 2) { 
                 currentSlide++; 
                 slider.style.transform = `translateX(-${currentSlide * 33.3333}%)`;
+                
+                // Update dots
                 dots.forEach((dot, i) => dot.classList.toggle('active', i === currentSlide));
+                
+                // Update active class buat trigger animasi teks
+                slides.forEach((slide, i) => slide.classList.toggle('active', i === currentSlide));
+                
                 btnText.innerText = currentSlide === 2 ? "GET STARTED" : "NEXT";
             } else { 
                 window.location.href = 'catalog.html'; 
