@@ -31,10 +31,13 @@
         .container { padding: 24px; max-width: 600px; margin: 0 auto; }
 
         .card { background: white; border-radius: 24px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(0,0,0,0.03); }
-        .checkout-item { display: flex; gap: 20px; align-items: center; }
-        .checkout-item img { width: 80px; height: 80px; border-radius: 16px; object-fit: cover; background: #f5f5f7; }
-        .item-info h2 { font-family: var(--nourd); font-size: 1.1rem; text-transform: uppercase; }
-        .item-info p { color: var(--gray); font-size: 0.9rem; margin-top: 4px; }
+        
+        /* Perbaikan: List Item agar bisa menampung banyak produk */
+        .checkout-item { display: flex; gap: 15px; align-items: center; padding: 10px 0; border-bottom: 1px solid #f5f5f7; }
+        .checkout-item:last-child { border-bottom: none; }
+        .checkout-item img { width: 60px; height: 60px; border-radius: 12px; object-fit: cover; background: #f5f5f7; }
+        .item-info h2 { font-family: var(--nourd); font-size: 0.9rem; text-transform: uppercase; }
+        .item-info p { color: var(--gray); font-size: 0.85rem; margin-top: 2px; }
 
         .section-title { font-family: var(--nourd); font-size: 0.75rem; letter-spacing: 1.5px; color: var(--gray); margin: 30px 0 15px; text-transform: uppercase; }
         
@@ -100,15 +103,8 @@
 
     <div class="container">
         <h2 class="section-title">Order Summary</h2>
-        <div class="card">
-            <div class="checkout-item">
-                <img id="orderImg" src="" alt="">
-                <div class="item-info">
-                    <h2 id="orderName">Loading...</h2>
-                    <p id="orderPrice">...</p>
-                </div>
-             </div>
-        </div>
+        <div class="card" id="orderList">
+            </div>
 
         <h2 class="section-title">Payment Method</h2>
         <div class="payment-option active" onclick="selectPayment(this)">
@@ -121,9 +117,9 @@
         </div>
 
         <div class="price-summary">
-            <div class="row"><span>Subtotal</span> <span id="subtotal">...</span></div>
+            <div class="row"><span>Subtotal</span> <span id="subtotal">Rp 0</span></div>
             <div class="row"><span>Shipping</span> <span>Free</span></div>
-            <div class="row total"><span>Total</span> <span id="grandTotal">...</span></div>
+            <div class="row total"><span>Total</span> <span id="grandTotal">Rp 0</span></div>
         </div>
 
         <button class="pay-btn" onclick="processPayment()">Confirm & Pay</button>
@@ -140,12 +136,50 @@
     </div>
 
     <script>
+        // Ambil data checkout (sekarang berupa Array)
         const checkoutData = JSON.parse(localStorage.getItem('sf_checkout'));
+        const orderList = document.getElementById('orderList');
+        let totalHargaAll = 0;
 
-        if (checkoutData) {
-            document.getElementById('orderImg').src = checkoutData.img || checkoutData.image;
-            document.getElementById('orderName').innerText = checkoutData.name;
-            document.getElementById('orderPrice').innerText = checkoutData.price;
+        if (checkoutData && Array.isArray(checkoutData)) {
+            orderList.innerHTML = ''; // Kosongkan dulu
+            
+            checkoutData.forEach(item => {
+                // Hitung total harga
+                const priceNum = parseInt(item.price.replace(/[^0-9]/g, '')) || 0;
+                totalHargaAll += priceNum;
+
+                // Template untuk tiap item
+                const itemHTML = `
+                    <div class="checkout-item">
+                        <img src="${item.img || item.image}" alt="${item.name}">
+                        <div class="item-info">
+                            <h2>${item.name}</h2>
+                            <p>${item.price}</p>
+                        </div>
+                    </div>
+                `;
+                orderList.innerHTML += itemHTML;
+            });
+
+            // Update Ringkasan Harga
+            const formattedTotal = `Rp ${totalHargaAll.toLocaleString('id-ID')}`;
+            document.getElementById('subtotal').innerText = formattedTotal;
+            document.getElementById('grandTotal').innerText = formattedTotal;
+
+        } else if (checkoutData && !Array.isArray(checkoutData)) {
+            // Fallback jika data yang masuk cuma satu objek (biar nggak error)
+            const priceNum = parseInt(checkoutData.price.replace(/[^0-9]/g, '')) || 0;
+            totalHargaAll = priceNum;
+            orderList.innerHTML = `
+                <div class="checkout-item">
+                    <img src="${checkoutData.img || checkoutData.image}" alt="${checkoutData.name}">
+                    <div class="item-info">
+                        <h2>${checkoutData.name}</h2>
+                        <p>${checkoutData.price}</p>
+                    </div>
+                </div>
+            `;
             document.getElementById('subtotal').innerText = checkoutData.price;
             document.getElementById('grandTotal').innerText = checkoutData.price;
         } else {
@@ -158,10 +192,12 @@
         }
 
         function processPayment() {
+            const formattedTotal = `Rp ${totalHargaAll.toLocaleString('id-ID')}`;
+            
             // 1. SIMPAN KE NOTIFIKASI
             const newNotif = {
-                productName: checkoutData.name,
-                price: checkoutData.price,
+                productName: checkoutData.length > 1 ? `${checkoutData[0].name} & ${checkoutData.length - 1} lainnya` : checkoutData[0].name,
+                price: formattedTotal,
                 date: new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })
             };
             let notifs = JSON.parse(localStorage.getItem('sf_notifications')) || [];
@@ -169,16 +205,22 @@
             localStorage.setItem('sf_notifications', JSON.stringify(notifs));
             localStorage.setItem('sf_notif_unread', 'true');
 
-            // 2. SIMPAN KE ORDER HISTORY (PENTING BIAR MUNCUL DI ORDERS.HTML)
-            const newOrder = {
-                name: checkoutData.name,
-                price: checkoutData.price,
-                img: checkoutData.img || checkoutData.image,
-                date: new Date().toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' }),
-                status: 'COMPLETED'
-            };
+            // 2. SIMPAN KE ORDER HISTORY
             let history = JSON.parse(localStorage.getItem('order_history')) || [];
-            history.push(newOrder);
+            
+            // Jika checkout banyak, simpan sebagai satu transaksi atau pisah? 
+            // Biasanya di histori belanja dipisah per produk:
+            checkoutData.forEach(item => {
+                const newOrder = {
+                    name: item.name,
+                    price: item.price,
+                    img: item.img || item.image,
+                    date: new Date().toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' }),
+                    status: 'COMPLETED'
+                };
+                history.push(newOrder);
+            });
+            
             localStorage.setItem('order_history', JSON.stringify(history));
 
             // 3. JALANKAN ANIMASI
@@ -188,9 +230,10 @@
             setTimeout(() => {
                 screen.classList.add('active');
                 localStorage.removeItem('sf_checkout'); 
+                localStorage.removeItem('sf_cart'); // Kosongkan keranjang setelah beli
             }, 100);
 
-            // 4. PINDAH KE ORDERS.HTML SETELAH ANIMASI SELESAI (2.5 Detik)
+            // 4. PINDAH KE ORDERS.HTML
             setTimeout(() => {
                 window.location.href = 'orders.html';
             }, 2500);
