@@ -3,13 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SuperFly | Welcome</title>
+    <title>SuperFly | Elite Experience</title>
     <style>
         :root {
-            --primary: #ffffff;
-            --dark: #1d1d1f;
-            --gray: #86868b;
-            --blue: #0071e3;
+            /* Tema Gelap & Mewah */
+            --bg: #000000;
+            --text-pure: #ffffff;
+            --accent-gray: #1d1d1f;
+            --shimmer: linear-gradient(
+                120deg, 
+                rgba(255,255,255,0) 30%, 
+                rgba(255,255,255,0.8) 50%, 
+                rgba(255,255,255,0) 70%
+            );
         }
 
         * {
@@ -20,12 +26,13 @@
         }
 
         body {
-            background-color: var(--primary);
+            background-color: var(--bg);
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             overflow: hidden;
+            color: var(--text-pure);
         }
 
         .container {
@@ -35,70 +42,98 @@
             align-items: center;
         }
 
-        /* Animasi Logo */
+        /* Logo dengan Efek Metalik Shimmer */
         .logo-box {
-            opacity: 0;
-            transform: translateY(10px);
-            animation: logoIn 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            position: relative;
+            margin-bottom: 5px;
         }
 
         .logo-text {
-            font-size: 3.5rem;
+            font-size: 4.5rem;
             font-weight: 800;
-            color: var(--dark);
-            letter-spacing: -3px;
+            letter-spacing: -0.05em;
+            color: var(--text-pure);
+            position: relative;
+            opacity: 0;
+            transform: scale(0.95);
+            animation: revealFull 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            /* Efek gradasi hitam-putih bergerak */
+            background: linear-gradient(
+                90deg, 
+                #ffffff 0%, 
+                #333333 25%, 
+                #ffffff 50%, 
+                #333333 75%, 
+                #ffffff 100%
+            );
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: revealFull 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards, 
+                       glossyMove 5s linear infinite;
         }
 
         .logo-text span {
-            color: var(--blue);
+            color: var(--text-pure);
+            -webkit-text-fill-color: var(--text-pure);
         }
 
-        /* Styling Tagline */
         .tagline {
-            font-size: 0.95rem;
-            color: var(--gray);
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.4);
             margin-top: 5px;
-            font-weight: 400;
-            letter-spacing: 0.5px;
+            font-weight: 300;
+            text-transform: uppercase;
+            letter-spacing: 0.4em;
             opacity: 0;
-            animation: fadeIn 1s 0.5s forwards; /* Muncul setelah logo */
+            animation: fadeIn 1.5s 0.8s forwards;
         }
 
-        /* Loading Bar */
-        .loader-container {
-            width: 140px;
-            height: 2px;
-            background: #f5f5f7;
-            border-radius: 10px;
-            margin-top: 40px;
-            overflow: hidden;
+        /* Circle Loader Tipis & Elegan */
+        .loader-box {
+            margin-top: 60px;
+            position: relative;
+            width: 40px;
+            height: 40px;
             opacity: 0;
-            animation: fadeIn 0.5s 1s forwards;
+            animation: fadeIn 1s 1.2s forwards;
         }
 
-        .loader-fill {
-            width: 0%;
+        .circle-loader {
+            width: 100%;
             height: 100%;
-            background: var(--dark);
-            animation: progress 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            border: 1px solid rgba(255, 255, 255, 0.1); /* Garis redup */
+            border-top: 1px solid #ffffff; /* Garis putih tajam */
+            border-radius: 50%;
+            animation: spin 1s cubic-bezier(0.5, 0, 0.5, 1) infinite;
         }
 
         /* Keyframes */
-        @keyframes logoIn {
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes revealFull {
+            to { 
+                opacity: 1; 
+                transform: scale(1); 
+            }
+        }
+
+        @keyframes glossyMove {
+            to { background-position: 200% center; }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         @keyframes fadeIn {
             to { opacity: 1; }
         }
 
-        @keyframes progress {
-            to { width: 100%; }
-        }
-
+        /* Exit Animation */
         .fade-out {
             opacity: 0;
-            transition: opacity 0.6s ease-in-out;
+            transform: scale(1.05);
+            filter: blur(10px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
     </style>
 </head>
@@ -109,20 +144,24 @@
             <h1 class="logo-text">SuperFly<span>.</span></h1>
         </div>
         
-        <p class="tagline">Siap antar seperti melayang!</p>
+        <p class="tagline">The Art of Delivery</p>
         
-        <div class="loader-container">
-            <div class="loader-fill"></div>
+        <div class="loader-box">
+            <div class="circle-loader"></div>
         </div>
     </div>
 
     <script>
-        setTimeout(() => {
-            document.getElementById('body').classList.add('fade-out');
+        window.addEventListener('load', () => {
+            // Splash screen selama 3.5 detik
             setTimeout(() => {
-                window.location.href = 'login.html';
-            }, 600);
-        }, 3200); // Durasi ditambah dikit biar taglinenya kebaca
+                document.getElementById('body').classList.add('fade-out');
+                setTimeout(() => {
+                    // Pastikan file login.html sudah ada
+                    window.location.replace('login.html'); 
+                }, 800);
+            }, 3500);
+        });
     </script>
 </body>
 </html>
